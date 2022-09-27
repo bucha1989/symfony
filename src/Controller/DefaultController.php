@@ -27,32 +27,32 @@ class DefaultController extends AbstractController
     }
 
 
-    /**
-     * @Route("/product-edit/{id}", methods="GET|POST", name="product_edit", requirements={"id"="\d+"})
-     * @Route("/product-add", methods="GET|POST", name="product_add")
-     */
-    public function editProduct(Request $request, int $id = 0): Response
-    {
-
-        $entityManager = $this->getDoctrine()->getManager();
-
-        if ($id) {
-            $product = $entityManager->getRepository(Product::class)->find($id);
-        } else {
-            $product = new Product();
-        }
-
-        $form = $this->createForm(EditProductFormType::class, $product);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($product);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('product_edit', ['id' => $product->getId()]);
-        }
-
-        return $this->render('main/default/product_edit.html.twig', ['form' => $form->createView()]);
-    }
+//    /**
+//     * @Route("/product-edit/{id}", methods="GET|POST", name="product_edit", requirements={"id"="\d+"})
+//     * @Route("/product-add", methods="GET|POST", name="product_add")
+//     */
+//    public function editProduct(Request $request, int $id = 0): Response
+//    {
+//
+//        $entityManager = $this->getDoctrine()->getManager();
+//
+//        if ($id) {
+//            $product = $entityManager->getRepository(Product::class)->find($id);
+//        } else {
+//            $product = new Product();
+//        }
+//
+//        $form = $this->createForm(EditProductFormType::class, $product);
+//
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $entityManager->persist($product);
+//            $entityManager->flush();
+//
+//            return $this->redirectToRoute('product_edit', ['id' => $product->getId()]);
+//        }
+//
+//        return $this->render('main/default/product_edit.html.twig', ['form' => $form->createView()]);
+//    }
 }
