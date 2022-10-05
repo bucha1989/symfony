@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Admin;
 
-use App\Entity\Product;
+use App\Entity\Category;
+use App\Form\DTO\EditProductModel;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -67,10 +69,21 @@ class EditProductFormType extends AbstractType
                 [
                     'label' => 'Choose new image',
                     'required' => false,
-                    'mapped' => false,
                     'attr' => [
                         'class' => 'form-control-file',
                     ],
+                ]
+            )
+            ->add('category', EntityType::class,
+                [
+                    'label' => 'Category',
+                    'required' => true,
+                    'class' => Category::class,
+                    'choice_label' => 'title',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+
                 ]
             )
             ->add('isPublished', CheckboxType::class,
@@ -103,7 +116,7 @@ class EditProductFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Product::class,
+            'data_class' => EditProductModel::class,
         ]);
     }
 }

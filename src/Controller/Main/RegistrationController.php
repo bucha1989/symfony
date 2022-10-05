@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Main;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
+use App\Form\Main\RegistrationFormType;
 use App\Repository\UserRepository;
-use App\Security\EmailVerifier;
+use App\Security\Verifier\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -60,6 +60,7 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('main/email/security/confirmation_email.html.twig')
             );
             // do anything else you need here, like send an email
+            $this->addFlash('success', 'Email has been sent');
 
             return $this->redirectToRoute('main_homepage');
         }

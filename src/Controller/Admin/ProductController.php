@@ -3,7 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Product;
-use App\Form\EditProductFormType;
+use App\Form\Admin\EditProductFormType;
+use App\Form\DTO\EditProductModel;
 use App\Form\Handler\ProductFormHandler;
 use App\Repository\ProductRepository;
 use App\Utils\Manager\ProductManager;
@@ -24,7 +25,7 @@ class ProductController extends AbstractController
     {
         $products = $productRepository->findBy(['isDeleted' => false], ['id' => 'DESC'], 50);
 
-        return $this->render('admin/product/list.html.twig', [
+        return $this->render('admin/product/list', [
             'products' => $products
         ]);
     }
@@ -40,36 +41,42 @@ class ProductController extends AbstractController
     public function edit(Request $request, ProductFormHandler $productFormHandler, Product $product = null): Response
     {
 
-        if (!$product){
-            $product = new Product();
-        }
 
-        $form = $this->createForm(EditProductFormType::class, $product);
+        $editProductModel = EditProductModel::makeFormProduct($product);
+
+        $form = $this->createForm(EditProductFormType::class, $editProductModel);
         $form->handleRequest($request);
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $productFormHandler->processEditForm($product, $form);
+            $product = $productFormHandler->processEditForm($editProductModel, $form);
+            $this->addFlash('success', 'Your changes were saved');
 
             return $this->redirectToRoute('admin_product_edit', ['id' => $product->getId()]);
         }
 
-//        $images = $product->getProductImages()->getValues();
+        if ($form->isSubmitted() && !$form->isValid()){
+            $this->addFlash('warning', 'Something went wrong');
+        }
+
+        $images = $product ? $product->getProductImages()->getValues() : [];
 
         return $this->render('admin/product/edit.html.twig', [
-            'images' => $product->getProductImages()->getValues() ?? [],
+            'images' => $images,
             'product' => $product,
             'form' => $form->createView()
         ]);
     }
 
     /**
-     * @Route("/delete/{id}", name="delete", requirements={"id"="\d"})
+     * @Route("/delete/{id}", name="delete")
      * @return Response
      */
     public function delete(Product $product, ProductManager $productManager): Response
     {
         $productManager->remove($product);
+
+        $this->addFlash('warning', 'Product has been deleted');
 
         return $this->redirectToRoute('admin_product_list');
     }
